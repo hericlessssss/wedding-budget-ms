@@ -1,6 +1,7 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Calculator, Users, Calendar, Image, CheckSquare } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Calculator, Users, Calendar, Image, CheckSquare, LogOut } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 const RingsIcon = () => (
   <svg
@@ -32,6 +33,17 @@ const navItems = [
 
 export function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      navigate('/');
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
+  };
 
   return (
     <header className="bg-white shadow-md">
@@ -40,11 +52,11 @@ export function Header() {
           <div className="flex-shrink-0 flex items-center">
             <Link to="/" className="flex items-center space-x-2">
               <RingsIcon />
-              <span className="text-2xl font-serif text-gray-900">Forever</span>
+              <span className="text-2xl font-serif text-gray-900">Vows4Ever</span>
             </Link>
           </div>
           
-          <nav className="hidden sm:flex sm:space-x-8">
+          <nav className="hidden sm:flex sm:space-x-8 items-center">
             {navItems.map(({ path, label, icon: Icon }) => {
               const isActive = location.pathname === path;
               return (
@@ -62,16 +74,24 @@ export function Header() {
                 </Link>
               );
             })}
+            <button
+              onClick={handleLogout}
+              className="ml-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 transition-colors duration-200"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Sair
+            </button>
           </nav>
 
           <div className="sm:hidden flex items-center">
             <button
               type="button"
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-rose-500"
             >
               <span className="sr-only">Abrir menu principal</span>
               <svg
-                className="h-6 w-6"
+                className={`${showMobileMenu ? 'hidden' : 'block'} h-6 w-6`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -83,13 +103,26 @@ export function Header() {
                   d="M4 6h16M4 12h16M4 18h16"
                 />
               </svg>
+              <svg
+                className={`${showMobileMenu ? 'block' : 'hidden'} h-6 w-6`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
             </button>
           </div>
         </div>
       </div>
 
       {/* Menu mobile */}
-      <div className="sm:hidden">
+      <div className={`${showMobileMenu ? 'block' : 'hidden'} sm:hidden`}>
         <div className="pt-2 pb-3 space-y-1">
           {navItems.map(({ path, label, icon: Icon }) => {
             const isActive = location.pathname === path;
@@ -102,6 +135,7 @@ export function Header() {
                     ? 'bg-rose-50 border-rose-500 text-rose-700'
                     : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
                 } block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
+                onClick={() => setShowMobileMenu(false)}
               >
                 <div className="flex items-center">
                   {typeof Icon === 'function' ? <Icon /> : <Icon className="h-5 w-5 mr-3" />}
@@ -110,6 +144,16 @@ export function Header() {
               </Link>
             );
           })}
+          <button
+            onClick={() => {
+              handleLogout();
+              setShowMobileMenu(false);
+            }}
+            className="w-full flex items-center pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700"
+          >
+            <LogOut className="h-5 w-5 mr-3" />
+            Sair
+          </button>
         </div>
       </div>
     </header>

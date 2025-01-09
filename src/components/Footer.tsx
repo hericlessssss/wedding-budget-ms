@@ -19,7 +19,7 @@ export function Footer() {
           <div className="space-y-4">
             <Link to="/" className="flex items-center space-x-2">
               <Heart className="h-8 w-8 text-rose-500" />
-              <span className="text-2xl font-serif text-gray-900">Forever</span>
+              <span className="text-2xl font-serif text-gray-900">Vows4Ever</span>
             </Link>
             <p className="text-gray-500 text-sm">
               Tornando seu dia especial perfeito, um detalhe de cada vez.
@@ -131,7 +131,7 @@ export function Footer() {
 
         <div className="mt-12 pt-8 border-t border-gray-200">
           <p className="text-center text-gray-400 text-sm">
-            © {new Date().getFullYear()} Forever. Todos os direitos reservados. Desenvolvido por{' '}
+            © {new Date().getFullYear()} Vows4Ever. Todos os direitos reservados. Desenvolvido por{' '}
             <a 
               href="https://www.instagram.com/labora_tech/" 
               target="_blank" 

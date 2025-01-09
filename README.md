@@ -1,6 +1,6 @@
-# Forever - Sistema de Gerenciamento de Casamento
+# Vows4Ever - Sistema de Gerenciamento de Casamento
 
-Forever é uma plataforma completa e intuitiva para gerenciamento de casamentos, desenvolvida com tecnologias modernas e focada na melhor experiência do usuário. O sistema oferece ferramentas essenciais para organizar todos os aspectos do planejamento do casamento, desde orçamentos até tarefas diárias.
+Vows4Ever é uma plataforma completa e intuitiva para gerenciamento de casamentos, desenvolvida com tecnologias modernas e focada na melhor experiência do usuário. O sistema oferece ferramentas essenciais para organizar todos os aspectos do planejamento do casamento, desde orçamentos até tarefas diárias.
 
 ## 🚀 Tecnologias Utilizadas
 
@@ -126,7 +126,7 @@ O sistema é totalmente responsivo, adaptando-se a diferentes tamanhos de tela:
 
 ## 🔄 Integração como Micro Frontend
 
-Para integrar o Forever como um micro frontend em um site existente, siga estas etapas:
+Para integrar o Vows4Ever como um micro frontend em um site existente, siga estas etapas:
 
 ### 1. Build do Projeto
 ```bash
@@ -136,14 +136,14 @@ npm run build
 ### 2. Configuração do Host
 No site principal, adicione as seguintes dependências:
 ```html
-<link rel="stylesheet" href="[caminho]/forever/style.css">
-<script type="module" src="[caminho]/forever/main.js"></script>
+<link rel="stylesheet" href="[caminho]/vows4ever/style.css">
+<script type="module" src="[caminho]/vows4ever/main.js"></script>
 ```
 
 ### 3. Componente de Integração
 ```javascript
-// forever-widget.js
-class ForeverWidget extends HTMLElement {
+// vows4ever-widget.js
+class Vows4EverWidget extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -151,31 +151,31 @@ class ForeverWidget extends HTMLElement {
 
   connectedCallback() {
     this.shadowRoot.innerHTML = `
-      <div id="forever-root"></div>
+      <div id="vows4ever-root"></div>
     `;
     
     // Inicializa o app
-    window.Forever.mount(this.shadowRoot.getElementById('forever-root'));
+    window.Vows4Ever.mount(this.shadowRoot.getElementById('vows4ever-root'));
   }
 }
 
-customElements.define('forever-widget', ForeverWidget);
+customElements.define('vows4ever-widget', Vows4EverWidget);
 ```
 
 ### 4. Uso no Site Principal
 ```html
-<!-- Adicione onde desejar que o Forever apareça -->
-<forever-widget></forever-widget>
+<!-- Adicione onde desejar que o Vows4Ever apareça -->
+<vows4ever-widget></vows4ever-widget>
 ```
 
 ### 5. Configuração de Rotas
-Certifique-se de que o sistema de rotas do site principal está configurado para lidar com as rotas do Forever:
+Certifique-se de que o sistema de rotas do site principal está configurado para lidar com as rotas do Vows4Ever:
 
 ```javascript
 // No router do site principal
 {
   path: '/wedding-planner/*',
-  component: () => import('./forever-widget')
+  component: () => import('./vows4ever-widget')
 }
 ```
 
@@ -185,8 +185,8 @@ Para manter a consistência visual:
 ```css
 /* Variáveis CSS compartilhadas */
 :root {
-  --forever-primary: #your-primary-color;
-  --forever-secondary: #your-secondary-color;
+  --vows4ever-primary: #your-primary-color;
+  --vows4ever-secondary: #your-secondary-color;
   /* ... outras variáveis ... */
 }
 ```
@@ -195,11 +195,11 @@ Para manter a consistência visual:
 Use eventos customizados para comunicação:
 
 ```javascript
-// Emitir eventos do Forever
-window.dispatchEvent(new CustomEvent('forever:event', { detail: data }));
+// Emitir eventos do Vows4Ever
+window.dispatchEvent(new CustomEvent('vows4ever:event', { detail: data }));
 
 // Escutar eventos no site principal
-window.addEventListener('forever:event', (e) => {
+window.addEventListener('vows4ever:event', (e) => {
   console.log(e.detail);
 });
 ```

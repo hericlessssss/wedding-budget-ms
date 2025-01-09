@@ -58,7 +58,7 @@ function Budget() {
   async function updateCategory(id: string, updates: Partial<BudgetCategory>) {
     const { error } = await supabase
       .from('budget_categories')
-      .update(updates)
+      .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', id);
 
     if (error) {
@@ -126,7 +126,7 @@ function Budget() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <input
             type="text"
-            placeholder="Nome da Categoria"
+            placeholder="Ex: Buffet, Decoração, Fotografia"
             value={newCategory.name}
             onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
             className="rounded-md border-gray-300 shadow-sm focus:border-rose-500 focus:ring-rose-500"
@@ -134,18 +134,22 @@ function Budget() {
           />
           <input
             type="number"
-            placeholder="Valor Acordado"
+            placeholder="Valor acordado (Ex: 5000)"
             value={newCategory.agreed_amount || ''}
             onChange={(e) => setNewCategory({ ...newCategory, agreed_amount: parseFloat(e.target.value) })}
             className="rounded-md border-gray-300 shadow-sm focus:border-rose-500 focus:ring-rose-500"
+            min="0"
+            step="0.01"
             required
           />
           <input
             type="number"
-            placeholder="Valor Gasto"
+            placeholder="Valor já pago (Ex: 1000)"
             value={newCategory.spent_amount || ''}
             onChange={(e) => setNewCategory({ ...newCategory, spent_amount: parseFloat(e.target.value) })}
             className="rounded-md border-gray-300 shadow-sm focus:border-rose-500 focus:ring-rose-500"
+            min="0"
+            step="0.01"
             required
           />
           <select
@@ -199,6 +203,7 @@ function Budget() {
                       value={category.name}
                       onChange={(e) => updateCategory(category.id, { name: e.target.value })}
                       className="rounded-md border-gray-300 shadow-sm focus:border-rose-500 focus:ring-rose-500"
+                      placeholder="Nome da categoria"
                     />
                   ) : (
                     <div className="text-sm font-medium text-gray-900">{category.name}</div>
@@ -211,6 +216,9 @@ function Budget() {
                       value={category.agreed_amount}
                       onChange={(e) => updateCategory(category.id, { agreed_amount: parseFloat(e.target.value) })}
                       className="rounded-md border-gray-300 shadow-sm focus:border-rose-500 focus:ring-rose-500"
+                      min="0"
+                      step="0.01"
+                      placeholder="Valor acordado"
                     />
                   ) : (
                     <div className="text-sm text-gray-900">R$ {category.agreed_amount.toLocaleString('pt-BR')}</div>
@@ -223,6 +231,9 @@ function Budget() {
                       value={category.spent_amount}
                       onChange={(e) => updateCategory(category.id, { spent_amount: parseFloat(e.target.value) })}
                       className="rounded-md border-gray-300 shadow-sm focus:border-rose-500 focus:ring-rose-500"
+                      min="0"
+                      step="0.01"
+                      placeholder="Valor já pago"
                     />
                   ) : (
                     <div className="text-sm text-gray-900">R$ {category.spent_amount.toLocaleString('pt-BR')}</div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PlusCircle, X, Calendar, AlertCircle, ArrowUp, ArrowDown, Clock, Edit2, Trash2 } from 'lucide-react';
+import { PlusCircle, X, Calendar, AlertCircle, ArrowUp, ArrowDown, Clock, Edit2, Trash2, Loader } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { supabase } from '../lib/supabase';
@@ -14,6 +14,7 @@ function Tasks() {
     title: '',
     description: '',
     priority: 'medium',
+    list_id: '',
   });
 
   useEffect(() => {
@@ -33,12 +34,15 @@ function Tasks() {
     }
 
     setLists(data || []);
+    if (data && data.length > 0 && !newTask.list_id) {
+      setNewTask(prev => ({ ...prev, list_id: data[0].id }));
+    }
   }
 
   async function fetchTasks() {
     const { data, error } = await supabase
       .from('tasks')
-      .select('*')
+      .select('*, task_lists(name)')
       .order('order', { ascending: true });
 
     if (error) {
@@ -52,11 +56,16 @@ function Tasks() {
   async function handleSaveEvent(e: React.FormEvent) {
     e.preventDefault();
 
+    const formattedTask = {
+      ...newTask,
+      due_date: newTask.due_date ? new Date(newTask.due_date).toISOString() : null,
+    };
+
     if (selectedTask) {
       const { error } = await supabase
         .from('tasks')
         .update({
-          ...newTask,
+          ...formattedTask,
           updated_at: new Date().toISOString(),
         })
         .eq('id', selectedTask.id);
@@ -69,8 +78,7 @@ function Tasks() {
       const { error } = await supabase
         .from('tasks')
         .insert([{
-          ...newTask,
-          list_id: lists[0]?.id,
+          ...formattedTask,
           user_id: (await supabase.auth.getUser()).data.user?.id,
         }]);
 
@@ -86,6 +94,7 @@ function Tasks() {
       title: '',
       description: '',
       priority: 'medium',
+      list_id: lists[0]?.id,
     });
     fetchTasks();
   }
@@ -159,6 +168,25 @@ function Tasks() {
       default:
         return 'Baixa';
     }
+  }
+
+  if (lists.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+        <div className="text-gray-500">Nenhuma lista encontrada. Isso pode acontecer se:</div>
+        <ul className="list-disc text-gray-500 pl-5">
+          <li>Você acabou de se cadastrar e as listas ainda estão sendo criadas</li>
+          <li>Houve algum problema durante a criação das listas</li>
+        </ul>
+        <button
+          onClick={fetchLists}
+          className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-rose-600 hover:bg-rose-700"
+        >
+          <Loader className="h-4 w-4 mr-2 animate-spin" />
+          Tentar novamente
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -264,6 +292,7 @@ function Tasks() {
                         title: '',
                         description: '',
                         priority: 'medium',
+                        list_id: lists[0]?.id,
                       });
                     }}
                     className="text-gray-400 hover:text-gray-500"
@@ -305,9 +334,10 @@ function Tasks() {
                     </label>
                     <select
                       id="list"
-                      value={newTask.list_id || lists[0]?.id}
+                      value={newTask.list_id}
                       onChange={(e) => setNewTask({ ...newTask, list_id: e.target.value })}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-rose-500 focus:ring-rose-500"
+                      required
                     >
                       {lists.map(list => (
                         <option key={list.id} value={list.id}>
@@ -335,15 +365,17 @@ function Tasks() {
                     <label htmlFor="due-date" className="block text-sm font-medium text-gray-700">
                       Data de Vencimento
                     </label>
-                    <div className="mt-1 relative">
+                    <div className="mt-1 relative rounded-md shadow-sm">
                       <input
                         type="datetime-local"
                         id="due-date"
-                        value={newTask.due_date ? format(new Date(newTask.due_date), "yyyy-MM-dd'T'HH:mm") : ''}
+                        value={newTask.due_date || ''}
                         onChange={(e) => setNewTask({ ...newTask, due_date: e.target.value })}
-                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-rose-500 focus:ring-rose-500"
+                        className="block w-full pr-10 sm:text-sm border-gray-300 rounded-md focus:ring-rose-500 focus:border-rose-500"
                       />
-                      <Calendar className="absolute right-3 top-2 h-5 w-5 text-gray-400" />
+                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <Calendar className="h-5 w-5 text-gray-400" />
+                      </div>
                     </div>
                   </div>
                 </div>
