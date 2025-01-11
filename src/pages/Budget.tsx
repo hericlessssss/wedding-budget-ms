@@ -102,7 +102,7 @@ function Budget() {
         </div>
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium text-gray-900">Total Gasto</h3>
+            <h3 className="text-lg font-medium text-gray-900">Total Pago</h3>
             <DollarSign className="h-8 w-8 text-rose-500" />
           </div>
           <p className="mt-2 text-3xl font-bold text-gray-900">
@@ -183,7 +183,7 @@ function Budget() {
                 Valor Acordado
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Valor Gasto
+                Valor Pago
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
