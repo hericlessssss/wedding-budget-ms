@@ -184,7 +184,7 @@ function Dashboard() {
           </div>
           <div className="mt-4">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-500">Pago: R$ {budgetSummary.spent.toLocaleString('pt-BR')}</span>
+              <span className="text-gray-500">Gasto: R$ {budgetSummary.spent.toLocaleString('pt-BR')}</span>
               <span className="text-gray-500">Restante: R$ {budgetSummary.remaining.toLocaleString('pt-BR')}</span>
             </div>
             <div className="mt-2 h-2 bg-gray-200 rounded-full">
@@ -393,7 +393,7 @@ function Dashboard() {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-900">Atualizar Orçamento</p>
-                <p className="mt-1 text-sm text-gray-500">Controle seus pagamento</p>
+                <p className="mt-1 text-sm text-gray-500">Controle seus gastos</p>
               </div>
             </div>
           </Link>

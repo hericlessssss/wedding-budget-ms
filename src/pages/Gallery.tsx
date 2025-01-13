@@ -108,13 +108,13 @@ function Gallery() {
   return (
     <div className="space-y-6">
       {/* Filtro de Categorias e Botão Adicionar */}
-      <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setSelectedCategory('all')}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors
               ${selectedCategory === 'all'
-                ? 'bg-rose-600 text-white'
+                ? 'bg-primary text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
           >
@@ -126,7 +126,7 @@ function Gallery() {
               onClick={() => setSelectedCategory(category)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors
                 ${selectedCategory === category
-                  ? 'bg-rose-600 text-white'
+                  ? 'bg-primary text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
             >
@@ -136,7 +136,7 @@ function Gallery() {
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500"
+          className="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
         >
           <PlusCircle className="h-5 w-5 mr-2" />
           Adicionar Imagem
@@ -197,7 +197,7 @@ function Gallery() {
                     id="title"
                     value={newImage.title}
                     onChange={(e) => setNewImage({ ...newImage, title: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-rose-500 focus:ring-rose-500"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
                     required
                   />
                 </div>
@@ -209,7 +209,7 @@ function Gallery() {
                     id="category"
                     value={newImage.category}
                     onChange={(e) => setNewImage({ ...newImage, category: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-rose-500 focus:ring-rose-500"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
                   >
                     {categories.map(category => (
                       <option key={category} value={category}>
@@ -228,7 +228,7 @@ function Gallery() {
                       id="image"
                       value={newImage.image_url}
                       onChange={(e) => setNewImage({ ...newImage, image_url: e.target.value })}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-rose-500 focus:ring-rose-500"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
                       required
                     />
                     <div className="flex-shrink-0">
@@ -244,13 +244,13 @@ function Gallery() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500"
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500"
+                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                 >
                   <PlusCircle className="h-4 w-4 mr-2" />
                   Adicionar Imagem

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Calculator, Users, Calendar, Image, CheckSquare, LogOut } from 'lucide-react';
+import { Calculator, Users, Calendar, Image, CheckSquare, LogOut, Settings } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 const RingsIcon = () => (
@@ -13,7 +13,7 @@ const RingsIcon = () => (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="h-8 w-8 text-rose-500"
+    className="h-8 w-8 text-primary"
   >
     <circle cx="9" cy="12" r="4" />
     <circle cx="15" cy="12" r="4" />
@@ -29,6 +29,7 @@ const navItems = [
   { path: '/schedule', label: 'Agenda', icon: Calendar },
   { path: '/gallery', label: 'Galeria', icon: Image },
   { path: '/tasks', label: 'Tarefas', icon: CheckSquare },
+  { path: '/settings', label: 'Configurações', icon: Settings },
 ];
 
 export function Header() {
@@ -65,7 +66,7 @@ export function Header() {
                   to={path}
                   className={`inline-flex items-center px-1 pt-1 text-sm font-medium border-b-2 transition-colors duration-200 ${
                     isActive
-                      ? 'border-rose-500 text-gray-900'
+                      ? 'border-primary text-gray-900'
                       : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                   }`}
                 >
@@ -76,7 +77,7 @@ export function Header() {
             })}
             <button
               onClick={handleLogout}
-              className="ml-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 transition-colors duration-200"
+              className="ml-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200"
             >
               <LogOut className="h-4 w-4 mr-2" />
               Sair
@@ -87,7 +88,7 @@ export function Header() {
             <button
               type="button"
               onClick={() => setShowMobileMenu(!showMobileMenu)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-rose-500"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
             >
               <span className="sr-only">Abrir menu principal</span>
               <svg
@@ -132,7 +133,7 @@ export function Header() {
                 to={path}
                 className={`${
                   isActive
-                    ? 'bg-rose-50 border-rose-500 text-rose-700'
+                    ? 'bg-accent border-primary text-primary'
                     : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
                 } block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
                 onClick={() => setShowMobileMenu(false)}

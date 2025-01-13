@@ -102,7 +102,7 @@ function Budget() {
         </div>
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium text-gray-900">Total Pago</h3>
+            <h3 className="text-lg font-medium text-gray-900">Total Gasto</h3>
             <DollarSign className="h-8 w-8 text-rose-500" />
           </div>
           <p className="mt-2 text-3xl font-bold text-gray-900">
@@ -129,7 +129,7 @@ function Budget() {
             placeholder="Ex: Buffet, Decoração, Fotografia"
             value={newCategory.name}
             onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
-            className="rounded-md border-gray-300 shadow-sm focus:border-rose-500 focus:ring-rose-500"
+            className="rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
             required
           />
           <input
@@ -137,7 +137,7 @@ function Budget() {
             placeholder="Valor acordado (Ex: 5000)"
             value={newCategory.agreed_amount || ''}
             onChange={(e) => setNewCategory({ ...newCategory, agreed_amount: parseFloat(e.target.value) })}
-            className="rounded-md border-gray-300 shadow-sm focus:border-rose-500 focus:ring-rose-500"
+            className="rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
             min="0"
             step="0.01"
             required
@@ -147,7 +147,7 @@ function Budget() {
             placeholder="Valor já pago (Ex: 1000)"
             value={newCategory.spent_amount || ''}
             onChange={(e) => setNewCategory({ ...newCategory, spent_amount: parseFloat(e.target.value) })}
-            className="rounded-md border-gray-300 shadow-sm focus:border-rose-500 focus:ring-rose-500"
+            className="rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
             min="0"
             step="0.01"
             required
@@ -155,7 +155,7 @@ function Budget() {
           <select
             value={newCategory.payment_status}
             onChange={(e) => setNewCategory({ ...newCategory, payment_status: e.target.value as 'pending' | 'partial' | 'paid' })}
-            className="rounded-md border-gray-300 shadow-sm focus:border-rose-500 focus:ring-rose-500"
+            className="rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
           >
             <option value="pending">Pendente</option>
             <option value="partial">Parcial</option>
@@ -163,7 +163,7 @@ function Budget() {
           </select>
           <button
             type="submit"
-            className="md:col-span-4 inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500"
+            className="md:col-span-4 inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
           >
             <PlusCircle className="h-5 w-5 mr-2" />
             Adicionar Categoria
@@ -183,7 +183,7 @@ function Budget() {
                 Valor Acordado
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Valor Pago
+                Valor Gasto
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
@@ -202,7 +202,7 @@ function Budget() {
                       type="text"
                       value={category.name}
                       onChange={(e) => updateCategory(category.id, { name: e.target.value })}
-                      className="rounded-md border-gray-300 shadow-sm focus:border-rose-500 focus:ring-rose-500"
+                      className="rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
                       placeholder="Nome da categoria"
                     />
                   ) : (
@@ -215,7 +215,7 @@ function Budget() {
                       type="number"
                       value={category.agreed_amount}
                       onChange={(e) => updateCategory(category.id, { agreed_amount: parseFloat(e.target.value) })}
-                      className="rounded-md border-gray-300 shadow-sm focus:border-rose-500 focus:ring-rose-500"
+                      className="rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
                       min="0"
                       step="0.01"
                       placeholder="Valor acordado"
@@ -230,7 +230,7 @@ function Budget() {
                       type="number"
                       value={category.spent_amount}
                       onChange={(e) => updateCategory(category.id, { spent_amount: parseFloat(e.target.value) })}
-                      className="rounded-md border-gray-300 shadow-sm focus:border-rose-500 focus:ring-rose-500"
+                      className="rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
                       min="0"
                       step="0.01"
                       placeholder="Valor já pago"
@@ -244,7 +244,7 @@ function Budget() {
                     <select
                       value={category.payment_status}
                       onChange={(e) => updateCategory(category.id, { payment_status: e.target.value as 'pending' | 'partial' | 'paid' })}
-                      className="rounded-md border-gray-300 shadow-sm focus:border-rose-500 focus:ring-rose-500"
+                      className="rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
                     >
                       <option value="pending">Pendente</option>
                       <option value="partial">Parcial</option>

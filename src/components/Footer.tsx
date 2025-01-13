@@ -5,9 +5,10 @@ import { Heart, Mail, Instagram, Facebook, Twitter } from 'lucide-react';
 export function Footer() {
   const [email, setEmail] = useState('');
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: Implement newsletter subscription
+    alert('Funcionalidade de newsletter será implementada em breve!');
     setEmail('');
   };
 
@@ -18,20 +19,20 @@ export function Footer() {
           {/* Brand */}
           <div className="space-y-4">
             <Link to="/" className="flex items-center space-x-2">
-              <Heart className="h-8 w-8 text-rose-500" />
+              <Heart className="h-8 w-8 text-primary" />
               <span className="text-2xl font-serif text-gray-900">Vows4Ever</span>
             </Link>
             <p className="text-gray-500 text-sm">
               Tornando seu dia especial perfeito, um detalhe de cada vez.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-rose-500 transition-colors">
+              <a href="#" className="text-gray-400 hover:text-primary transition-colors">
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-rose-500 transition-colors">
+              <a href="#" className="text-gray-400 hover:text-primary transition-colors">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-rose-500 transition-colors">
+              <a href="#" className="text-gray-400 hover:text-primary transition-colors">
                 <Twitter className="h-5 w-5" />
               </a>
             </div>
@@ -44,22 +45,22 @@ export function Footer() {
             </h3>
             <ul className="space-y-3">
               <li>
-                <Link to="/budget" className="text-gray-500 hover:text-rose-500 transition-colors">
+                <Link to="/budget" className="text-gray-500 hover:text-primary transition-colors">
                   Planejador de Orçamento
                 </Link>
               </li>
               <li>
-                <Link to="/suppliers" className="text-gray-500 hover:text-rose-500 transition-colors">
+                <Link to="/suppliers" className="text-gray-500 hover:text-primary transition-colors">
                   Diretório de Fornecedores
                 </Link>
               </li>
               <li>
-                <Link to="/schedule" className="text-gray-500 hover:text-rose-500 transition-colors">
+                <Link to="/schedule" className="text-gray-500 hover:text-primary transition-colors">
                   Linha do Tempo
                 </Link>
               </li>
               <li>
-                <Link to="/gallery" className="text-gray-500 hover:text-rose-500 transition-colors">
+                <Link to="/gallery" className="text-gray-500 hover:text-primary transition-colors">
                   Galeria de Inspiração
                 </Link>
               </li>
@@ -73,22 +74,22 @@ export function Footer() {
             </h3>
             <ul className="space-y-3">
               <li>
-                <a href="#" className="text-gray-500 hover:text-rose-500 transition-colors">
+                <a href="#" className="text-gray-500 hover:text-primary transition-colors">
                   Checklist de Casamento
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-500 hover:text-rose-500 transition-colors">
+                <a href="#" className="text-gray-500 hover:text-primary transition-colors">
                   Dicas de Planejamento
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-500 hover:text-rose-500 transition-colors">
+                <a href="#" className="text-gray-500 hover:text-primary transition-colors">
                   Guia de Fornecedores
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-500 hover:text-rose-500 transition-colors">
+                <a href="#" className="text-gray-500 hover:text-primary transition-colors">
                   Perguntas Frequentes
                 </a>
               </li>
@@ -114,13 +115,13 @@ export function Footer() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Digite seu email"
-                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-1 focus:ring-rose-500 focus:border-rose-500 text-sm"
+                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm"
                     required
                   />
                 </div>
                 <button
                   type="submit"
-                  className="flex-shrink-0 px-4 py-2 border border-transparent text-sm font-medium rounded-r-md text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500"
+                  className="flex-shrink-0 px-4 py-2 border border-transparent text-sm font-medium rounded-r-md text-white bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                 >
                   Inscrever-se
                 </button>
@@ -136,7 +137,7 @@ export function Footer() {
               href="https://www.instagram.com/labora_tech/" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="text-rose-500 hover:text-rose-600 transition-colors"
+              className="text-primary hover:text-opacity-90 transition-colors"
             >
               Labora Tech
             </a>
