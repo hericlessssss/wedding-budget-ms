@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PlusCircle, Trash2, Edit2, Save, X, UserPlus, Users } from 'lucide-react';
+import { PlusCircle, Trash2, Edit2, Save, X, UserPlus, Users, Heart, BellRing as Ring } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { Guest } from '../types/database.types';
 
@@ -48,32 +48,29 @@ function GuestList() {
     setGuests(data || []);
   }
 
-  function calculateExpectedGuests() {
-    const totalGuests = guests.length;
-    const totalFamilyMembers = guests.reduce((sum, guest) => 
+  function calculateStats() {
+    const brideGuests = guests.filter(g => g.side === 'bride');
+    const groomGuests = guests.filter(g => g.side === 'groom');
+
+    const brideFamilyMembers = brideGuests.reduce((sum, guest) => 
+      sum + (guest.guest_family_members?.length || 0), 0);
+    const groomFamilyMembers = groomGuests.reduce((sum, guest) => 
       sum + (guest.guest_family_members?.length || 0), 0);
 
-    const highProbGuests = guests.filter(g => g.probability === 'high').length;
-    const mediumProbGuests = guests.filter(g => g.probability === 'medium').length;
-
-    // Calculando a média ponderada
-    // Alta probabilidade: 95% de chance de comparecer
-    // Média probabilidade: 70% de chance de comparecer
-    const expectedGuests = Math.round(
-      (highProbGuests * 0.95) + 
-      (mediumProbGuests * 0.70)
-    );
-
-    const expectedTotal = Math.round(
-      ((highProbGuests + mediumProbGuests) * 0.825) + // Média entre 95% e 70%
-      (totalFamilyMembers * 0.80) // 80% dos familiares
-    );
+    const totalBrideSide = brideGuests.length + brideFamilyMembers;
+    const totalGroomSide = groomGuests.length + groomFamilyMembers;
+    const totalGuests = totalBrideSide + totalGroomSide;
 
     const deliveredInvitations = guests.filter(g => g.invitation_delivered).length;
 
     return {
-      total: totalGuests + totalFamilyMembers,
-      expected: expectedTotal,
+      totalGuests,
+      totalBrideSide,
+      totalGroomSide,
+      brideGuests: brideGuests.length,
+      groomGuests: groomGuests.length,
+      brideFamilyMembers,
+      groomFamilyMembers,
       deliveredInvitations
     };
   }
@@ -82,7 +79,6 @@ function GuestList() {
     e.preventDefault();
 
     try {
-      // Obter o ID do usuário uma vez no início
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
 
@@ -180,7 +176,9 @@ function GuestList() {
     fetchGuests();
   }
 
-  const stats = calculateExpectedGuests();
+  const stats = calculateStats();
+  const brideGuests = guests.filter(g => g.side === 'bride');
+  const groomGuests = guests.filter(g => g.side === 'groom');
 
   return (
     <div className="space-y-6">
@@ -190,7 +188,7 @@ function GuestList() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total de Convidados</p>
-              <p className="text-2xl font-semibold text-gray-900">{stats.total}</p>
+              <p className="text-2xl font-semibold text-gray-900">{stats.totalGuests}</p>
             </div>
             <div className="p-3 bg-blue-100 rounded-full">
               <Users className="h-6 w-6 text-blue-600" />
@@ -201,11 +199,14 @@ function GuestList() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Presença Esperada</p>
-              <p className="text-2xl font-semibold text-gray-900">{stats.expected}</p>
+              <p className="text-sm font-medium text-gray-600">Lado da Noiva</p>
+              <p className="text-2xl font-semibold text-gray-900">{stats.totalBrideSide}</p>
+              <p className="text-sm text-gray-500">
+                {stats.brideGuests} convidados + {stats.brideFamilyMembers} familiares
+              </p>
             </div>
-            <div className="p-3 bg-green-100 rounded-full">
-              <Users className="h-6 w-6 text-green-600" />
+            <div className="p-3 bg-pink-100 rounded-full">
+              <Heart className="h-6 w-6 text-pink-600" />
             </div>
           </div>
         </div>
@@ -213,7 +214,22 @@ function GuestList() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Convites Entregues por Família</p>
+              <p className="text-sm font-medium text-gray-600">Lado do Noivo</p>
+              <p className="text-2xl font-semibold text-gray-900">{stats.totalGroomSide}</p>
+              <p className="text-sm text-gray-500">
+                {stats.groomGuests} convidados + {stats.groomFamilyMembers} familiares
+              </p>
+            </div>
+            <div className="p-3 bg-blue-100 rounded-full">
+              <Ring className="h-6 w-6 text-blue-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Convites Entregues</p>
               <p className="text-2xl font-semibold text-gray-900">{stats.deliveredInvitations}</p>
             </div>
             <div className="p-3 bg-purple-100 rounded-full">
@@ -235,87 +251,179 @@ function GuestList() {
         </button>
       </div>
 
-      {/* Lista de Convidados */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {guests.map((guest) => (
-          <div
-            key={guest.id}
-            className="bg-white rounded-lg shadow-md overflow-hidden"
-          >
-            <div className="p-6">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900">
-                    {guest.name} {guest.surname}
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    {guest.side === 'bride' ? 'Lado da Noiva' : 'Lado do Noivo'}
-                  </p>
-                </div>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => {
-                      setSelectedGuest(guest);
-                      setNewGuest(guest);
-                      setFamilyMembers(guest.guest_family_members || []);
-                      setShowModal(true);
-                    }}
-                    className="text-gray-400 hover:text-gray-500"
-                  >
-                    <Edit2 className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(guest.id)}
-                    className="text-gray-400 hover:text-red-500"
-                  >
-                    <Trash2 className="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
-
-              <div className="mt-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-500">Probabilidade:</span>
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    guest.probability === 'high'
-                      ? 'bg-green-100 text-green-800'
-                      : guest.probability === 'medium'
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : 'bg-red-100 text-red-800'
-                  }`}>
-                    {guest.probability === 'high' ? 'Alta' : 
-                     guest.probability === 'medium' ? 'Média' : 'Baixa'}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-500">Convite Entregue:</span>
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    guest.invitation_delivered
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}>
-                    {guest.invitation_delivered ? 'Sim' : 'Não'}
-                  </span>
-                </div>
-
-                {guest.guest_family_members && guest.guest_family_members.length > 0 && (
-                  <div className="mt-4">
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">Familiares:</h4>
-                    <ul className="space-y-1">
-                      {guest.guest_family_members.map((member, index) => (
-                        <li key={index} className="text-sm text-gray-500">
-                          {member.name} {member.surname}
-                          {member.age && ` (${member.age} anos)`}
-                        </li>
-                      ))}
-                    </ul>
+      {/* Lista de Convidados em Duas Colunas */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Lado da Noiva */}
+        <div>
+          <h2 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+            <Heart className="h-5 w-5 text-pink-500 mr-2" />
+            Lado da Noiva ({stats.totalBrideSide} pessoas)
+          </h2>
+          <div className="space-y-4">
+            {brideGuests.map((guest) => (
+              <div
+                key={guest.id}
+                className="bg-white rounded-lg shadow-md overflow-hidden"
+              >
+                <div className="p-6">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-lg font-medium text-gray-900">
+                        {guest.name} {guest.surname}
+                      </h3>
+                    </div>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => {
+                          setSelectedGuest(guest);
+                          setNewGuest(guest);
+                          setFamilyMembers(guest.guest_family_members || []);
+                          setShowModal(true);
+                        }}
+                        className="text-gray-400 hover:text-gray-500"
+                      >
+                        <Edit2 className="h-5 w-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(guest.id)}
+                        className="text-gray-400 hover:text-red-500"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
+                    </div>
                   </div>
-                )}
+
+                  <div className="mt-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-500">Probabilidade:</span>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        guest.probability === 'high'
+                          ? 'bg-green-100 text-green-800'
+                          : guest.probability === 'medium'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {guest.probability === 'high' ? 'Alta' : 
+                         guest.probability === 'medium' ? 'Média' : 'Baixa'}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-500">Convite Entregue:</span>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        guest.invitation_delivered
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {guest.invitation_delivered ? 'Sim' : 'Não'}
+                      </span>
+                    </div>
+
+                    {guest.guest_family_members && guest.guest_family_members.length > 0 && (
+                      <div className="mt-4">
+                        <h4 className="text-sm font-medium text-gray-900 mb-2">Familiares:</h4>
+                        <ul className="space-y-1">
+                          {guest.guest_family_members.map((member, index) => (
+                            <li key={index} className="text-sm text-gray-500">
+                              {member.name} {member.surname}
+                              {member.age && ` (${member.age} anos)`}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
-        ))}
+        </div>
+
+        {/* Lado do Noivo */}
+        <div>
+          <h2 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+            <Ring className="h-5 w-5 text-blue-500 mr-2" />
+            Lado do Noivo ({stats.totalGroomSide} pessoas)
+          </h2>
+          <div className="space-y-4">
+            {groomGuests.map((guest) => (
+              <div
+                key={guest.id}
+                className="bg-white rounded-lg shadow-md overflow-hidden"
+              >
+                <div className="p-6">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-lg font-medium text-gray-900">
+                        {guest.name} {guest.surname}
+                      </h3>
+                    </div>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => {
+                          setSelectedGuest(guest);
+                          setNewGuest(guest);
+                          setFamilyMembers(guest.guest_family_members || []);
+                          setShowModal(true);
+                        }}
+                        className="text-gray-400 hover:text-gray-500"
+                      >
+                        <Edit2 className="h-5 w-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(guest.id)}
+                        className="text-gray-400 hover:text-red-500"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-500">Probabilidade:</span>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        guest.probability === 'high'
+                          ? 'bg-green-100 text-green-800'
+                          : guest.probability === 'medium'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {guest.probability === 'high' ? 'Alta' : 
+                         guest.probability === 'medium' ? 'Média' : 'Baixa'}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-500">Convite Entregue:</span>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        guest.invitation_delivered
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {guest.invitation_delivered ? 'Sim' : 'Não'}
+                      </span>
+                    </div>
+
+                    {guest.guest_family_members && guest.guest_family_members.length > 0 && (
+                      <div className="mt-4">
+                        <h4 className="text-sm font-medium text-gray-900 mb-2">Familiares:</h4>
+                        <ul className="space-y-1">
+                          {guest.guest_family_members.map((member, index) => (
+                            <li key={index} className="text-sm text-gray-500">
+                              {member.name} {member.surname}
+                              {member.age && ` (${member.age} anos)`}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Modal */}
