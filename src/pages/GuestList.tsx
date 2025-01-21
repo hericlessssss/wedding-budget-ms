@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { PlusCircle, Trash2, Edit2, Save, X, UserPlus, Users, Heart, BellRing as Ring } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import type { Guest } from '../types/database.types';
+import type { Guest, GuestFamilyMember } from '../types/database.types';
 
-interface GuestFamilyMember {
-  name: string;
-  surname?: string;
-  age?: number;
+interface GuestWithFamilyMembers extends Guest {
+  guest_family_members: GuestFamilyMember[];
 }
 
 function GuestList() {
-  const [guests, setGuests] = useState<Guest[]>([]);
+  const [guests, setGuests] = useState<GuestWithFamilyMembers[]>([]);
   const [showModal, setShowModal] = useState(false);
-  const [selectedGuest, setSelectedGuest] = useState<Guest | null>(null);
-  const [familyMembers, setFamilyMembers] = useState<GuestFamilyMember[]>([]);
+  const [selectedGuest, setSelectedGuest] = useState<GuestWithFamilyMembers | null>(null);
+  const [familyMembers, setFamilyMembers] = useState<Partial<GuestFamilyMember>[]>([]);
   const [newGuest, setNewGuest] = useState<Partial<Guest>>({
     name: '',
     surname: '',
@@ -27,25 +25,33 @@ function GuestList() {
   }, []);
 
   async function fetchGuests() {
-    const { data, error } = await supabase
+    // First fetch all guests
+    const { data: guestsData, error: guestsError } = await supabase
       .from('guests')
-      .select(`
-        *,
-        guest_family_members (
-          id,
-          name,
-          surname,
-          age
-        )
-      `)
+      .select('*')
       .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Erro ao buscar convidados:', error);
+    if (guestsError) {
+      console.error('Erro ao buscar convidados:', guestsError);
       return;
     }
 
-    setGuests(data || []);
+    // Then fetch family members for all guests
+    const guestsWithFamily = await Promise.all((guestsData || []).map(async (guest) => {
+      const { data: familyData, error: familyError } = await supabase
+        .from('guest_family_members')
+        .select('*')
+        .eq('guest_id', guest.id);
+
+      if (familyError) {
+        console.error('Erro ao buscar familiares:', familyError);
+        return { ...guest, guest_family_members: [] };
+      }
+
+      return { ...guest, guest_family_members: familyData || [] };
+    }));
+
+    setGuests(guestsWithFamily);
   }
 
   function calculateStats() {
@@ -82,46 +88,42 @@ function GuestList() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
 
+      let guestId: string;
+
       if (selectedGuest) {
-        // Atualizar convidado existente
+        // Update existing guest
         const { error: updateError } = await supabase
           .from('guests')
           .update({
-            ...newGuest,
+            name: newGuest.name,
+            surname: newGuest.surname,
+            side: newGuest.side,
+            probability: newGuest.probability,
+            invitation_delivered: newGuest.invitation_delivered,
             updated_at: new Date().toISOString(),
           })
           .eq('id', selectedGuest.id);
 
         if (updateError) throw updateError;
+        guestId = selectedGuest.id;
 
-        // Remover familiares antigos
+        // Delete existing family members
         const { error: deleteError } = await supabase
           .from('guest_family_members')
           .delete()
-          .eq('guest_id', selectedGuest.id);
+          .eq('guest_id', guestId);
 
         if (deleteError) throw deleteError;
-
-        // Adicionar novos familiares se houver
-        if (familyMembers.length > 0) {
-          const { error: familyError } = await supabase
-            .from('guest_family_members')
-            .insert(
-              familyMembers.map(member => ({
-                guest_id: selectedGuest.id,
-                user_id: user.id,
-                ...member
-              }))
-            );
-
-          if (familyError) throw familyError;
-        }
       } else {
-        // Criar novo convidado
+        // Create new guest
         const { data: guestData, error: insertError } = await supabase
           .from('guests')
           .insert([{
-            ...newGuest,
+            name: newGuest.name,
+            surname: newGuest.surname,
+            side: newGuest.side,
+            probability: newGuest.probability,
+            invitation_delivered: newGuest.invitation_delivered,
             user_id: user.id,
           }])
           .select()
@@ -129,21 +131,24 @@ function GuestList() {
 
         if (insertError) throw insertError;
         if (!guestData) throw new Error('Erro ao criar convidado');
+        guestId = guestData.id;
+      }
 
-        // Adicionar familiares para o novo convidado
-        if (familyMembers.length > 0) {
-          const { error: familyError } = await supabase
-            .from('guest_family_members')
-            .insert(
-              familyMembers.map(member => ({
-                guest_id: guestData.id,
-                user_id: user.id,
-                ...member
-              }))
-            );
+      // Add family members if any
+      if (familyMembers.length > 0) {
+        const { error: familyError } = await supabase
+          .from('guest_family_members')
+          .insert(
+            familyMembers.map(member => ({
+              guest_id: guestId,
+              user_id: user.id,
+              name: member.name,
+              surname: member.surname,
+              age: member.age
+            }))
+          );
 
-          if (familyError) throw familyError;
-        }
+        if (familyError) throw familyError;
       }
 
       setShowModal(false);
@@ -163,6 +168,7 @@ function GuestList() {
   }
 
   async function handleDelete(id: string) {
+    // Family members will be automatically deleted due to ON DELETE CASCADE
     const { error } = await supabase
       .from('guests')
       .delete()
@@ -587,10 +593,10 @@ function GuestList() {
                           </div>
                           <input
                             type="text"
-                            value={member.name}
+                            value={member.name || ''}
                             onChange={(e) => {
                               const newMembers = [...familyMembers];
-                              newMembers[index].name = e.target.value;
+                              newMembers[index] = { ...newMembers[index], name: e.target.value };
                               setFamilyMembers(newMembers);
                             }}
                             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
@@ -602,7 +608,7 @@ function GuestList() {
                             value={member.surname || ''}
                             onChange={(e) => {
                               const newMembers = [...familyMembers];
-                              newMembers[index].surname = e.target.value;
+                              newMembers[index] = { ...newMembers[index], surname: e.target.value };
                               setFamilyMembers(newMembers);
                             }}
                             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
@@ -613,7 +619,7 @@ function GuestList() {
                             value={member.age || ''}
                             onChange={(e) => {
                               const newMembers = [...familyMembers];
-                              newMembers[index].age = parseInt(e.target.value) || undefined;
+                              newMembers[index] = { ...newMembers[index], age: parseInt(e.target.value) || undefined };
                               setFamilyMembers(newMembers);
                             }}
                             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
