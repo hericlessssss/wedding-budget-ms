@@ -113,11 +113,21 @@ function Suppliers() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
+    // Garantir que o preço seja um número válido
+    const price = typeof newSupplier.price === 'string' 
+      ? parseFloat(newSupplier.price) 
+      : newSupplier.price || 0;
+
+    const supplierData = {
+      ...newSupplier,
+      price, // Usar o valor numérico processado
+    };
+
     if (selectedSupplier) {
       const { error } = await supabase
         .from('suppliers')
         .update({
-          ...newSupplier,
+          ...supplierData,
           updated_at: new Date().toISOString(),
         })
         .eq('id', selectedSupplier.id);
@@ -130,7 +140,7 @@ function Suppliers() {
       const { error } = await supabase
         .from('suppliers')
         .insert([{
-          ...newSupplier,
+          ...supplierData,
           user_id: (await supabase.auth.getUser()).data.user?.id,
         }]);
 
@@ -168,6 +178,19 @@ function Suppliers() {
 
     fetchSuppliers();
   }
+
+  const formatCurrency = (value: number | null | undefined) => {
+  if (value === null || value === undefined) return 'R$ 0,00';
+  // Multiplicar o valor por 100 caso esteja sendo armazenado como um número inteiro em reais
+  const adjustedValue = value >= 1000 ? value : value * 100;
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(adjustedValue);
+};
+
 
   const filteredSuppliers = suppliers.filter(supplier => {
     const matchesSearch = supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -276,10 +299,7 @@ function Suppliers() {
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-500">Valor:</span>
                   <span className="text-sm font-medium text-gray-900">
-                    {new Intl.NumberFormat('pt-BR', {
-                      style: 'currency',
-                      currency: 'BRL'
-                    }).format(supplier.price)}
+                    {formatCurrency(supplier.price)}
                   </span>
                 </div>
 
@@ -445,13 +465,22 @@ function Suppliers() {
                           type="number"
                           id="price"
                           value={newSupplier.price || ''}
-                          onChange={(e) => setNewSupplier({ ...newSupplier, price: parseFloat(e.target.value) })}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            // Garantir que o valor seja um número válido
+                            const numericValue = value === '' ? 0 : parseFloat(value);
+                            setNewSupplier({ ...newSupplier, price: numericValue });
+                          }}
                           className="pl-12 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
                           min="0"
                           step="0.01"
+                          placeholder="0,00"
                           required
                         />
                       </div>
+                      <p className="mt-1 text-sm text-gray-500">
+                        Digite o valor total (ex: 4300.00 para R$ 4.300,00)
+                      </p>
                     </div>
 
                     <div>

@@ -30,7 +30,7 @@ function Budget() {
     }
 
     setCategories(data || []);
-    const total = (data || []).reduce((sum, cat) => sum + cat.agreed_amount, 0);
+    const total = (data || []).reduce((sum, cat) => sum + (cat.agreed_amount || 0), 0);
     setTotalBudget(total);
   }
 
@@ -84,8 +84,16 @@ function Budget() {
     fetchCategories();
   }
 
-  const totalSpent = categories.reduce((sum, cat) => sum + cat.spent_amount, 0);
+  const totalSpent = categories.reduce((sum, cat) => sum + (cat.spent_amount || 0), 0);
   const remaining = totalBudget - totalSpent;
+
+  const formatCurrency = (value: number | null | undefined) => {
+    if (value === null || value === undefined) return 'R$ 0,00';
+    return value.toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -97,7 +105,7 @@ function Budget() {
             <DollarSign className="h-8 w-8 text-green-500" />
           </div>
           <p className="mt-2 text-3xl font-bold text-gray-900">
-            R$ {totalBudget.toLocaleString('pt-BR')}
+            {formatCurrency(totalBudget)}
           </p>
         </div>
         <div className="bg-white rounded-lg shadow p-6">
@@ -106,7 +114,7 @@ function Budget() {
             <DollarSign className="h-8 w-8 text-rose-500" />
           </div>
           <p className="mt-2 text-3xl font-bold text-gray-900">
-            R$ {totalSpent.toLocaleString('pt-BR')}
+            {formatCurrency(totalSpent)}
           </p>
         </div>
         <div className="bg-white rounded-lg shadow p-6">
@@ -115,7 +123,7 @@ function Budget() {
             <DollarSign className="h-8 w-8 text-blue-500" />
           </div>
           <p className="mt-2 text-3xl font-bold text-gray-900">
-            R$ {remaining.toLocaleString('pt-BR')}
+            {formatCurrency(remaining)}
           </p>
         </div>
       </div>
@@ -221,7 +229,7 @@ function Budget() {
                       placeholder="Valor acordado"
                     />
                   ) : (
-                    <div className="text-sm text-gray-900">R$ {category.agreed_amount.toLocaleString('pt-BR')}</div>
+                    <div className="text-sm text-gray-900">{formatCurrency(category.agreed_amount)}</div>
                   )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -236,7 +244,7 @@ function Budget() {
                       placeholder="Valor já pago"
                     />
                   ) : (
-                    <div className="text-sm text-gray-900">R$ {category.spent_amount.toLocaleString('pt-BR')}</div>
+                    <div className="text-sm text-gray-900">{formatCurrency(category.spent_amount)}</div>
                   )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">

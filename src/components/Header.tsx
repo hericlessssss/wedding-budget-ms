@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Calculator, Users, Calendar, Image, CheckSquare, LogOut, Settings } from 'lucide-react';
+import { Calculator, Users, Calendar, Image, CheckSquare, LogOut, Settings, UserPlus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 const RingsIcon = () => (
@@ -29,6 +29,7 @@ const navItems = [
   { path: '/schedule', label: 'Agenda', icon: Calendar },
   { path: '/gallery', label: 'Galeria', icon: Image },
   { path: '/tasks', label: 'Tarefas', icon: CheckSquare },
+  { path: '/guests', label: 'Convidados', icon: UserPlus },
   { path: '/settings', label: 'Configurações', icon: Settings },
 ];
 

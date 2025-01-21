@@ -9,6 +9,7 @@ import Schedule from './pages/Schedule';
 import Gallery from './pages/Gallery';
 import Tasks from './pages/Tasks';
 import Settings from './pages/Settings';
+import GuestList from './pages/GuestList';
 import { Auth } from './components/Auth';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -40,6 +41,7 @@ function AppContent() {
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/guests" element={<GuestList />} />
         </Routes>
       </main>
       <Footer />
